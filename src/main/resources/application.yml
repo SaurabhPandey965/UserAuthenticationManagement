@@ -1,0 +1,24 @@
+server:
+  port: 7865
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  application:
+    name: Auth_Service
+  datasource:
+    url: jdbc:mysql://localhost:3306/UserDb?createDatabaseIfNotExist=true&useSSL=false
+    username: root
+    password: Saurabh!1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+     hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+  main:
+    allow-circular-references: true
+    
+file:
+  upload-dir: .\uploadFile
