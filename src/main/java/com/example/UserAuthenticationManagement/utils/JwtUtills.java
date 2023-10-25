@@ -15,7 +15,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtills {
-
+      //5 hr token expiration time
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 	private String secret = "saurabhkumarpandey";
 	public static final String TOKEN_PREFIX = "Bearer ";
@@ -91,9 +91,9 @@ public class JwtUtills {
 
 	// validate token
 	public Boolean validateToken(String token, String userName) {
-		final String username = getUsernameFromToken(token);
-		System.out.println("validateToken" + username + "userDetails " + userName);
-		if (username.equals(userName) && !isTokenExpired(token)) {
+		final String userNameFromToken = getUsernameFromToken(token);
+		System.out.println("getUsernameFromToken" + userNameFromToken + "userDetails " + userName);
+		if (userNameFromToken.equals(userName) && !isTokenExpired(token)) {
 			return true;
 		}
 		return false;
