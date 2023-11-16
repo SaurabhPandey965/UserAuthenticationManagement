@@ -2,12 +2,16 @@ package com.example.UserAuthenticationManagement.utils;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.example.UserAuthenticationManagement.entity.Roles;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -15,7 +19,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtills {
-      //5 hr token expiration time
+	// 5 hr token expiration time
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 	private String secret = "saurabhkumarpandey";
 	public static final String TOKEN_PREFIX = "Bearer ";
@@ -23,18 +27,12 @@ public class JwtUtills {
 	// retrieve username from jwt token
 	public String getUsernameFromToken(String token) {
 		System.out.println(token);
-		// token.replaceAll("Bearer ", "");
 
-		return getClaimFromToken(token, Claims::getSubject);
+		return getAllClaimsFromToken(token).getSubject();
+
+		// return getClaimFromToken(token, Claims::getSubject);
 	}
 
-	// retrieve expiration date from jwt token
-	/*
-	 * public Date getExpirationDateFromToken(String token) {
-	 * System.out.println("getExpirationDateFromToken"); // return
-	 * getClaimFromToken(token, Claims::getExpiration); return
-	 * getExpirationDateFromToken(token); }
-	 */
 	public Date getExpiredDateFromToken(String token) {
 		try {
 			Claims claims = getAllClaimsFromToken(token);
@@ -48,7 +46,8 @@ public class JwtUtills {
 		System.out.println("getClaimFromToken" + token);
 		final Claims claims = getAllClaimsFromToken(token);
 		Date exp = claims.getExpiration();
-		System.out.println("exp" + exp);
+		String userName = claims.getSubject();
+		System.out.println("exp: " + exp + "userName: " + userName);
 		return claimsResolver.apply(claims);
 	} // for
 
@@ -69,9 +68,11 @@ public class JwtUtills {
 	}
 
 	// generate token for user
-	public String generateToken(String userName) {
+	public String generateToken(String userName, List<Roles> roles) {
 		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, userName);
+		claims.put(Constant.CLAIM_KEY_USERNAME, userName);
+		claims.put(Constant.CLAIM_KEY_ROLES, roles.stream().map(a -> a.getName()).toList());
+		return doGenerateToken(claims);
 	}
 
 	// while creating the token -
@@ -80,11 +81,10 @@ public class JwtUtills {
 	// 3. According to JWS Compact
 	// Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
 	// compaction of the JWT to a URL-safe string
-	private String doGenerateToken(Map<String, Object> claims, String subject) {
+	private String doGenerateToken(Map<String, Object> claims) {
 
-		String token = Jwts.builder().setClaims(claims).setSubject(subject)
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 5000))
+		String token = Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
 		return token;
 	}

@@ -37,8 +37,10 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtills jwtUtills;
 
-	@Autowired
-	private UserDetailsServiceImpl userDetailsServiceImpl;
+	/*
+	 * @Autowired private UserDetailsServiceImpl userDetailsServiceImpl;
+	 */
+
 
 	@Autowired
 	private UserService userService;

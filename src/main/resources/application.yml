@@ -17,8 +17,13 @@ spring:
     properties:
      hibernate:
       dialect: org.hibernate.dialect.MySQL5Dialect
+    show-sql: true
   main:
     allow-circular-references: true
     
 file:
   upload-dir: .\uploadFile
+initializer:
+    enabled: ${INITIALIZER_ENABLED:true}
+    username: ${INITIALIZER_USERNAME:admin@saurabh.com}
+    password: ${INITIALIZER_PASSWORD:admin}

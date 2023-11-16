@@ -1,6 +1,7 @@
 package com.example.UserAuthenticationManagement.controler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,7 +68,7 @@ public class AuthController {
 			AuthResponseDTO authResponseDTO = new AuthResponseDTO();
 			if (userEnty != null) {
 
-				authResponseDTO.setAccessToken("Bearer " + jwtTokenUtil.generateToken(authRequestDto.getUserName().toLowerCase()));
+				authResponseDTO.setAccessToken("Bearer " + jwtTokenUtil.generateToken(authRequestDto.getUserName().toLowerCase(),new ArrayList<>()));
 				authResponseDTO.setExpiresIn(jwtTokenUtil.getExpiredDateFromToken(authResponseDTO.getAccessToken().replaceAll(Constant.TOKEN_PREFIX, "")));
 				return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
 			} else {

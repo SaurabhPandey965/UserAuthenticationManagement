@@ -31,17 +31,18 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
 		Optional<UserEntity> user = userDao.findByUserName(username);
-	UserInfoDetails userDetails = user.map(UserInfoDetails :: new).orElseThrow(()-> new UsernameNotFoundException("user not found"));
+	 UserInfoDetails userDetails = user.map(UserInfoDetails :: new).orElseThrow(()-> new UsernameNotFoundException("user not found"));
 		return userDetails;
 	}
 	public UserEntity createUser(UserDto userDto) {
-		Optional<UserEntity> user = userDao.findByUserName(userDto.getUserName());
+		Optional<UserEntity> user = userDao.findByUserName(userDto.getUsername());
 		if (user.isPresent()) {
 			throw new RuntimeException("user already present");
 		}
-		ModelMapper modeMapper = new ModelMapper();
-		UserEntity usr = modeMapper.map(userDto, UserEntity.class);
-		usr.setPassword(passwordEncoder.encode(usr.getPassword()));
+		//ModelMapper modeMapper = new ModelMapper();
+		//UserEntity usr = modeMapper.map(userDto, UserEntity.class);
+		  UserEntity usr  = new UserEntity();
+		  usr.setPassword(passwordEncoder.encode(usr.getPassword()));
 		
 		return userDao.save(usr);
 
