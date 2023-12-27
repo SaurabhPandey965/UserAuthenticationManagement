@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 public class UserDto implements UserDetails {
 	Integer id;
-	String userName;
+	String username;
 	String password;
 	String firstName;
 	String lastName;
@@ -30,11 +30,7 @@ public class UserDto implements UserDetails {
 		return grantedAuthorities;
 	}
 
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public boolean isAccountNonExpired() {
@@ -51,7 +47,7 @@ public class UserDto implements UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -59,5 +55,8 @@ public class UserDto implements UserDetails {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+
 
 }

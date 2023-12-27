@@ -73,7 +73,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
 	private UsernamePasswordAuthenticationToken getAuthenticationToken(HttpServletRequest request) {
 		String token = request.getHeader(Constant.HEADER_STRING);
-		System.out.println("token :" + token);
+		System.out.println("token: "+ token);
 		// String jwtToken = null;
 		if (token != null) {
 			// token.substring(7);
@@ -81,11 +81,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 			String userName = jwtUtills.getUsernameFromToken(jwtToken);
 			System.out.println("userName " + userName);
 			// UserDetails user = userDetailsServiceImpl.loadUserByUsername(userName);
-			UserEntity user = userService.getUserByUserName(userName);
-			System.out.println(user);
-			if (jwtUtills.validateToken(jwtToken, user.getUserName())) {
-				System.out.println("true");
-				return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+			UserDetails user = userService.loadUserByUsername(userName);
+			//UserEntity user = userService.getUserByUserName(userName);
+			System.out.println("user: "+user);
+			if (jwtUtills.validateToken(jwtToken, user.getUsername())) {
+				return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 			}
 
 			return null;

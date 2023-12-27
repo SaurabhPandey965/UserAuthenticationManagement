@@ -23,8 +23,10 @@ import lombok.Setter;
 public class Authority {
 
 	@Id
+	@Column(nullable = false, updatable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
 	private String code;
 	@Column(name = "\"description\"")
 	private String description;

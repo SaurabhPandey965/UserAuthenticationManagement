@@ -1,5 +1,6 @@
 package com.example.UserAuthenticationManagement.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -18,29 +19,39 @@ public class AuthorityService {
 
 	@Autowired
 	AuthorityDao authorityDao;
-	private ModelMapper modelMapper;
 
-	
+	/*
+	 * @Autowired private ModelMapper modelMapper;
+	 */
 	public void findAllById(long id) {
-		
-	}
-	public void saveAuthority(AuthorityDto authorityDto) throws Exception {
 
-		Optional<Authority> authority = authorityDao.findById(authorityDto.getId());
-		if(authority.isEmpty()) {
-		Authority entity = mapDtoToAuthority(authorityDto);
-		authorityDao.save(entity);
+	}
+
+	public void saveAuthority(AuthorityDto authorityDto)  {
+
+		List<Authority> authority = authorityDao.findByCode(authorityDto.getCode());
+		if (authority.isEmpty()) {
+			Authority entity = mapDtoToAuthority(authorityDto);
+			authorityDao.save(entity);
 		}
-		throw new Exception("Record allready Found");
+		//throw new Exception("Record allready Found");
 	}
 
 	public AuthorityDto mapToDto(final Authority authority, AuthorityDto authorityDto) {
-	   return modelMapper.map(authority, authorityDto.getClass());
-	}
-	public Authority mapDtoToAuthority(AuthorityDto authorityDto) {
 
-		Authority entity = modelMapper.map(authorityDto, Authority.class);
+		authorityDto.setCode(authority.getCode());
+		authorityDto.setDescription(authority.getDescription());
+		return authorityDto;
+		// modelMapper.map(authority, authorityDto.getClass());
+	}
+
+	public Authority mapDtoToAuthority(AuthorityDto authorityDto) {
+              
+		Authority entity = new Authority();
+		entity.setCode(authorityDto.getCode());
+		entity.setDescription(authorityDto.getDescription());
+		//Authority entity = modelMapper.map(authorityDto, Authority.class);
 		return entity;
-		//authorityDao.save(entity);
+		// authorityDao.save(entity);
 	}
 }

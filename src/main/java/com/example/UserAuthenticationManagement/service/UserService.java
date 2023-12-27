@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.UserAuthenticationManagement.dao.AuthorityDao;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@Transactional
 public class UserService implements UserDetailsService {
 
 	@Value("${initializer.username}")
@@ -113,11 +115,12 @@ public class UserService implements UserDetailsService {
 			Optional<UserEntity> user = userDao.findByUserName(adminUsername);
 			if (user.isEmpty()) {
 				UserDto userDto = new UserDto();
+				userDto.setUsername(adminUsername);
+				userDto.setPassword(adminPassword);
 				userDto.setFirstName("super");
 				userDto.setLastName("admin");
 				userDto.setEmail(adminUsername);
-				userDto.setUserName(adminUsername);
-				userDto.setPassword(adminPassword);
+
 				userDto.setRoles(new ArrayList<>());
 				userDto.getRoles().add(roleService.get(adminRole.getId()));
 				createUser(userDto);
@@ -157,14 +160,15 @@ public class UserService implements UserDetailsService {
 		return userList;
 	}
 
-	public UserEntity getUserByUserName(String username) {
+	public UserDto getUserByUserName(String username) {
 		Optional<UserEntity> user = userDao.findByUserName(username);
 		if (user.isEmpty()) {
 			throw new RuntimeException("Record not found for " + username);
 		}
 		// List<UserEntity> user = userDao.findAll();
-
-		return user.get();
+		UserDto userDto = new UserDto();
+       UserDto dto = mapToDto(userDto, user.get());
+		return dto;
 
 	}
 
@@ -224,10 +228,10 @@ public class UserService implements UserDetailsService {
 	}
 
 	public UserDto mapToDto(UserDto userDto, final UserEntity userEntity) {
-
+      log.info("UserEntity: "+userEntity);
 		userDto.setFirstName(userEntity.getFirstName());
 		userDto.setLastName(userEntity.getLastName());
-		userDto.setUserName(userEntity.getUserName());
+		userDto.setUsername(userEntity.getUserName());
 		// userDto.setPassword(userEntity.getPassword());
 		userDto.setEmail(userEntity.getEmail());
 		userDto.setPhone(userEntity.getPhone());
@@ -239,6 +243,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	public UserEntity mapDtoTOEntity(UserDto userDto) {
+		log.info("userDto: "+userDto);
 		UserEntity userEntity = new UserEntity();
 		userEntity.setId(userDto.getId());
 		userEntity.setEmail(userDto.getEmail());

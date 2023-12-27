@@ -16,6 +16,7 @@ import com.example.UserAuthenticationManagement.entity.Roles;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.lang.Objects;
 
 @Component
 public class JwtUtills {
@@ -36,6 +37,7 @@ public class JwtUtills {
 	public Date getExpiredDateFromToken(String token) {
 		try {
 			Claims claims = getAllClaimsFromToken(token);
+
 			return claims.getExpiration();
 		} catch (NullPointerException e) {
 			return null;
@@ -55,7 +57,7 @@ public class JwtUtills {
 
 	private Claims getAllClaimsFromToken(String token) {
 		// token.replaceAll("Bearer ", "");
-		System.out.println("getAllClaimsFromToken" + token);
+		System.out.println("getAllClaimsFromToken: " + token);
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 	}
 
@@ -63,7 +65,7 @@ public class JwtUtills {
 	private Boolean isTokenExpired(String token) {
 
 		final Date expiration = getExpiredDateFromToken(token);
-		System.out.println("isTokenExpired" + expiration);
+		System.out.println("isTokenExpired: " + expiration);
 		return expiration.before(new Date());
 	}
 
@@ -72,7 +74,13 @@ public class JwtUtills {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(Constant.CLAIM_KEY_USERNAME, userName);
 		claims.put(Constant.CLAIM_KEY_ROLES, roles.stream().map(a -> a.getName()).toList());
-		return doGenerateToken(claims);
+		return doGenerateToken(claims, JWT_TOKEN_VALIDITY);
+	}
+
+	public String generateRefreshToken(String userName) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put(Constant.CLAIM_KEY_USERNAME, userName);
+		return doGenerateToken(claims, Constant.REFRESHTOKEN_LIFE_TIME);
 	}
 
 	// while creating the token -
@@ -81,10 +89,10 @@ public class JwtUtills {
 	// 3. According to JWS Compact
 	// Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
 	// compaction of the JWT to a URL-safe string
-	private String doGenerateToken(Map<String, Object> claims) {
+	private String doGenerateToken(Map<String, Object> claims, long expirationTime) {
 
 		String token = Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+				.setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
 		return token;
 	}
@@ -92,7 +100,7 @@ public class JwtUtills {
 	// validate token
 	public Boolean validateToken(String token, String userName) {
 		final String userNameFromToken = getUsernameFromToken(token);
-		System.out.println("getUsernameFromToken" + userNameFromToken + "userDetails " + userName);
+		System.out.println("getUsernameFromToken: " + userNameFromToken + " userDetails: " + userName);
 		if (userNameFromToken.equals(userName) && !isTokenExpired(token)) {
 			return true;
 		}

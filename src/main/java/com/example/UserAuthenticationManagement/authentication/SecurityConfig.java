@@ -1,8 +1,11 @@
 package com.example.UserAuthenticationManagement.authentication;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.UserAuthenticationManagement.service.UserDetailsServiceImpl;
-
+import com.example.UserAuthenticationManagement.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +32,7 @@ public class SecurityConfig {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return new UserDetailsServiceImpl();
+		return new UserService();
 	}
 
 	@Bean
@@ -45,12 +48,15 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		return http.csrf().disable().authorizeRequests().antMatchers("/v1/auth/**").permitAll()
+		http = http.csrf().disable();
+		http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
+		http = http.exceptionHandling().authenticationEntryPoint((request, response, exception) -> response
+				.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage())).and();
+		http = http.authorizeRequests().antMatchers("/v1/auth/**").permitAll()
 				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-				.anyRequest().authenticated().and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class).build();
-
+				.anyRequest().authenticated().and();
+		http = http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+		return http.build();
 	}
 
 	@Bean
