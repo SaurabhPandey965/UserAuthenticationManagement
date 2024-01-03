@@ -34,9 +34,9 @@ public class RoleService {
 		return rolesDao.save(roles).getId();
 	}
 
-	public List<Roles> findAllRoles() {
-		List<Roles> roles = rolesDao.findAll();
-		return roles;
+	public List<RolesDto> findAllRoles() {
+		return rolesDao.findAll().stream().map(role -> mapToDto(new RolesDto(), role)).toList();
+
 	}
 
 	public void deleteAllRole() {

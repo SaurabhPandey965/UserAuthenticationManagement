@@ -1,5 +1,7 @@
 package com.example.UserAuthenticationManagement.controler;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.UserAuthenticationManagement.dto.UserDto;
+import com.example.UserAuthenticationManagement.entity.UserEntity;
 import com.example.UserAuthenticationManagement.service.UserService;
 import com.example.UserAuthenticationManagement.utils.Authorities;
 
@@ -57,7 +60,7 @@ public class UserController {
 	// "jwtToken") })
 
 	@GetMapping("/getAllUser")
-	@PreAuthorize("hasAuthority('" + Authorities.READ_AUTHORITY + "')")
+	//@PreAuthorize("hasAuthority('" + Authorities.READ_USER + "')")
 
 	ResponseEntity<?> getAllUser() {
 		log.info("getAllUser api calling......");
@@ -65,11 +68,14 @@ public class UserController {
 	}
 
 	@DeleteMapping("/deleteUser")
+	@PreAuthorize("hasAuthority('" + Authorities.DELETE_USER + "')")
+
 	public void deleteUser() {
 		userService.deleteUser();
 	}
 
 	@PutMapping("/updateUser/{id}")
+	@PreAuthorize("hasAuthority('" + Authorities.UPDATE_USER + "')")
 	ResponseEntity<Void> updateUser(@PathVariable Integer id, @RequestBody UserDto userDto) {
 		userService.updateUser(id, userDto);
 		return ResponseEntity.ok().build();

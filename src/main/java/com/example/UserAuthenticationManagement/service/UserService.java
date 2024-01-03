@@ -163,22 +163,26 @@ public class UserService implements UserDetailsService {
 	public UserDto getUserByUserName(String username) {
 		Optional<UserEntity> user = userDao.findByUserName(username);
 		if (user.isEmpty()) {
-			throw new RuntimeException("Record not found for " + username);
+			// throw new RuntimeException("Record not found for " + username);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Record not found for: " + username);
 		}
 		// List<UserEntity> user = userDao.findAll();
 		UserDto userDto = new UserDto();
-       UserDto dto = mapToDto(userDto, user.get());
+		UserDto dto = mapToDto(userDto, user.get());
 		return dto;
 
 	}
 
-	public List<UserEntity> getAllUser() {
+	public List<UserDto> getAllUser() {
 
 		Optional<List<UserEntity>> user = Optional.ofNullable(userDao.findAll());
 		if (user.isPresent()) {
-			return user.get();
+			log.info("user: " + user.get());
+			List<UserEntity> listUser = user.get();
+			return listUser.stream().map(users -> mapToDto(new UserDto(), users)).toList();
+			
 		}
-		return null;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Record Found");
 	}
 
 	public void updateUser(Integer id, UserDto userDto) {
@@ -211,7 +215,7 @@ public class UserService implements UserDetailsService {
 			userDao.save(userEntity);
 			log.info("user updated succesfully " + name);
 		} else {
-			throw new RuntimeException("userNot found for" + id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "userNot found for" + id);
 
 		}
 	}
@@ -223,16 +227,19 @@ public class UserService implements UserDetailsService {
 	}
 
 	public void deletuserById(int id) {
-		userDao.deleteById(id);
-		log.info("user deleted for :" + id);
+		if (!userDao.findById(id).isEmpty()) {
+			userDao.deleteById(id);
+			log.info("user deleted for :" + id);
+		}
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found for this: " + id);
 	}
 
 	public UserDto mapToDto(UserDto userDto, final UserEntity userEntity) {
-      log.info("UserEntity: "+userEntity);
+		log.info("UserEntity: " + userEntity);
 		userDto.setFirstName(userEntity.getFirstName());
 		userDto.setLastName(userEntity.getLastName());
 		userDto.setUsername(userEntity.getUserName());
-		// userDto.setPassword(userEntity.getPassword());
+		userDto.setPassword(passwordEncoder.encode(userEntity.getPassword()));
 		userDto.setEmail(userEntity.getEmail());
 		userDto.setPhone(userEntity.getPhone());
 		if (userEntity.getRoles() != null) {
@@ -243,7 +250,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	public UserEntity mapDtoTOEntity(UserDto userDto) {
-		log.info("userDto: "+userDto);
+		log.info("userDto: " + userDto);
 		UserEntity userEntity = new UserEntity();
 		userEntity.setId(userDto.getId());
 		userEntity.setEmail(userDto.getEmail());

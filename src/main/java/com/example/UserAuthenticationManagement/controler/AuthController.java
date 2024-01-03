@@ -62,7 +62,7 @@ public class AuthController {
 	@PostMapping("creatUser")
 	ResponseEntity<?> createUser(@RequestBody UserDto userDto) {
 		log.info("creatUser api calling :" + userDto);
-		return new ResponseEntity<>(userDetailsServiceImpl.createUser(userDto), HttpStatus.CREATED);
+		return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
 	}
 
 	@PostMapping("getJwtToken")
@@ -84,8 +84,7 @@ public class AuthController {
 			if (user != null) {
 
 			    Set<Roles> roles = userService.getRoleByUsername(user.getUsername());
-				authResponseDTO.setAccessToken(Constant.TOKEN_PREFIX
-						+ jwtTokenUtil.generateToken(authRequestDto.getUserName().toLowerCase(), roles.stream().toList()));
+				authResponseDTO.setAccessToken(jwtTokenUtil.generateToken(authRequestDto.getUserName().toLowerCase(), roles.stream().toList()));
 				authResponseDTO.setExpiresIn(jwtTokenUtil.getExpiredDateFromToken(
 						authResponseDTO.getAccessToken().replaceAll(Constant.TOKEN_PREFIX, "")));
 				authResponseDTO.setRefreshToken(jwtTokenUtil.generateRefreshToken(user.getUsername()));
