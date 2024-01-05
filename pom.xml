@@ -119,6 +119,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>userauthenticationmanagement</finalName>
 	</build>
 
 </project>
