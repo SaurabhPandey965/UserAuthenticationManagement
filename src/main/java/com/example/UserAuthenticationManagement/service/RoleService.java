@@ -2,6 +2,7 @@ package com.example.UserAuthenticationManagement.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class RoleService {
 
 	public List<RolesDto> findAllRoles() {
 		return rolesDao.findAll().stream().map(roles -> mapToDto(new RolesDto(), roles)).toList();
-
+		
 	}
 
 	public void deleteAllRole() {

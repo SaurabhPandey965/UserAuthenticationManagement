@@ -1,0 +1,32 @@
+version: 1.0.0
+services:
+      authapp: 
+        build: .
+        image: userAuthenticationManagement.jar
+        environment:
+         SPRING_DATASOURCE_URL: jdbc:mysql://db:3706/userdb?createDatabaseIfNotExist=true&useSSL=false
+         SPRING_DATASOURCE_PASSWORD: saurabh@1
+         SPRING_DATASOURCE_USERNAME: root
+        depends_on:
+         - db  
+        networks:
+        - backened
+      db:
+       image: mysql
+       ports:
+       - 3706:3306
+       environment:
+            MYSQL_ROOT_PASSWORD: saurabh@1
+            MYSQL_PASSWORD: saurabh
+            MYSQL_DATABASE: userdb
+       networks:
+       - backened
+       
+       
+networks:
+   backened: 
+     name:  authapp    
+      
+        
+         
+      
