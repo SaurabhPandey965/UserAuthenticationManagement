@@ -2,7 +2,7 @@ version: 1.0.0
 services:
       authapp: 
         build: .
-        image: userAuthenticationManagement.jar
+        image: userauthenticationmanagement.jar
         environment:
          SPRING_DATASOURCE_URL: jdbc:mysql://db:3706/userdb?createDatabaseIfNotExist=true&useSSL=false
          SPRING_DATASOURCE_PASSWORD: saurabh@1
